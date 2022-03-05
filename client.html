@@ -1,0 +1,50 @@
+<html>
+  <body>
+    <!-- Rest of markup -->
+
+    <script src="https://rawgit.com/socketio/socket.io-client/master/dist/socket.io.js"></script>
+    <script>
+      const local = 'http://192.168.100.7:8080/';
+      const socket = io.connect(local);
+
+      function add_to_chatbox(message) {
+          var new_message = document.createElement("p");
+          new_message.innerHTML = message;
+          document.getElementById("chat_box").appendChild(new_message);
+      }
+
+
+      function create_message() {
+          const message = document.getElementById("textbox").value;
+          socket.emit('send_message', message);
+          add_to_chatbox(`You says: ${message}`);
+          document.getElementById("textbox").value = "";
+      }
+
+
+      function send_nickname() {
+        const nickname = document.getElementById("textbox_nickname").value;
+        socket.emit('set_nickname', nickname);
+      }
+
+
+      // Check if socket is connected
+      socket.on('connect', function() {
+          const message = 'Connected to server';
+          add_to_chatbox(message);
+      });
+
+      socket.on('receive_message', function(message) {
+          add_to_chatbox(message);
+      });
+
+    </script>
+    <div id="chat_box" style="border: black 10px;"></div>
+    <input type="text" id="textbox">
+    <button onclick="create_message()">Send</button>
+    
+    <label for="textbox_nickname">Nickname:</label>
+    <input type="text" id="textbox_nickname">
+    <button onclick="send_nickname()">Send</button>
+  </body>
+</html>
